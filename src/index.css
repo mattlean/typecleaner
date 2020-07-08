@@ -11,6 +11,10 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
+label {
+  display: block;
+}
+
 #root {
   margin: 0 auto;
   max-width: 1140px;
@@ -29,12 +33,12 @@ body {
   grid-column: 1/-1;
 }
 
-.grid > h2 {
+.grid > .io {
   grid-row: 3/4;
 }
 
 .grid > textarea {
-  grid-row: -1/-2;
+  grid-row: 4/5;
 }
 
 #ops {
