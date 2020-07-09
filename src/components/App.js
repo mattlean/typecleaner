@@ -102,7 +102,11 @@ function App() {
           }
         }
   
-        newTxt = paragraphs.join('\n')
+        if(origTxtType === 'html') {
+          newTxt = paragraphs.join('</p>')
+        } else {
+          newTxt = paragraphs.join('\n')
+        }
       }
     }
 
@@ -113,15 +117,6 @@ function App() {
     } else if(newlineTransform === 'remove') {
       // Remove all newlines
       newTxt = newTxt.replace(/\n+/g, '')
-    }
-
-    // Spaces
-    if(spaceTransform === 'reduce') {
-      // Reduce multiple spaces
-      newTxt = newTxt.replace(/ +/g, ' ')
-    } else if(spaceTransform === 'remove') {
-      // Remove all spaces
-      newTxt = newTxt.replace(/ +/g, '')
     }
 
     // HTML
@@ -163,6 +158,15 @@ function App() {
       }
     }
 
+    // Spaces
+    if(spaceTransform === 'reduce') {
+      // Reduce multiple spaces
+      newTxt = newTxt.replace(/ +/g, ' ')
+    } else if(spaceTransform === 'remove') {
+      // Remove all spaces
+      newTxt = newTxt.replace(/ +/g, '')
+    }
+
     // Special Characters
     if(htmlEntities === 'encode') {
       newTxt = encode(newTxt)
@@ -178,6 +182,19 @@ function App() {
 
   useEffect(() => {
     if(autoClean) clean()
+
+    if(origTxtType !== 'html' && conversionType !== 'html') {
+      if(swapPTagNewlinesSpaces) setSwapPTagNewlinesSpaces(false)
+      if(pTagTransform === 'remove') setPTagTransform('')
+      if(htmlEntities) setHTMLEntities('')
+    }
+
+    if(conversionType !== 'html') {
+      if(preventWidows) setPreventWidows(false)
+      if(pTagTransform === 'single' || pTagTransform === 'multiple') {
+        setPTagTransform('')
+      }
+    }
   }, [
     origTxtType,
     conversionType,
@@ -233,7 +250,7 @@ function App() {
           <select onChange={e => setHTMLEntities(e.target.value)}>
             <option value="">None</option>
             <option value="encode">Encode all</option>
-            <option value="encode-unsafe">Encode & ignore unsafe characters</option>
+            <option value="encode-unsafe">Encode but ignore unsafe characters</option>
             <option value="decode">Decode</option>
           </select>
         </label>
