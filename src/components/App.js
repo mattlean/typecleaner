@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react'
+import { decode , encode } from 'he'
 
 function App() {
   const [origTxtType, setOrigTxtType] = useState('plain')
@@ -8,6 +9,7 @@ function App() {
   const [spaceTransform, setSpaceTransform] = useState('')
   const [swapPTagNewlinesSpaces, setSwapPTagNewlinesSpaces] = useState(false)
   const [pTagTransform, setPTagTransform] = useState('')
+  const [htmlEntities, setHTMLEntities] = useState('')
   const [trim, setTrim] = useState(false)
   const [spellCheck, setSpellcheck] = useState(true)
   const [origTxt, setOrigTxt] = useState('')
@@ -145,7 +147,7 @@ function App() {
       newTxt = paragraphs.join('\n')
     } else if(pTagTransform === 'remove') {
       // Remove all p tags
-      newTxt = newTxt.replace(/(<p[^>]+?>|<p>|<\/p>)/img, '');
+      newTxt = newTxt.replace(/(<p[^>]+?>|<p>|<\/p>)/img, '')
     }
 
     // Replace newlines in p tags with spaces
@@ -160,6 +162,15 @@ function App() {
         newTxt = paragraphs.join('</p>')
       }
     }
+
+    // Special Characters
+    if(htmlEntities === 'encode') {
+      newTxt = encode(newTxt)
+    } else if(htmlEntities === 'encode-unsafe') {
+      newTxt = encode(newTxt, { allowUnsafeSymbols: true })
+    } else if(htmlEntities === 'decode') {
+      newTxt = decode(newTxt)
+    }
   
     console.log(JSON.stringify(newTxt))
     setCleanTxt(newTxt)
@@ -167,7 +178,21 @@ function App() {
 
   useEffect(() => {
     if(autoClean) clean()
-  }, [origTxtType, conversionType, preventWidows, newlineTransform, spaceTransform, swapPTagNewlinesSpaces, pTagTransform, trim, spellCheck, origTxt, cleanTxt, autoClean])
+  }, [
+    origTxtType,
+    conversionType,
+    preventWidows,
+    newlineTransform,
+    spaceTransform,
+    swapPTagNewlinesSpaces,
+    pTagTransform,
+    htmlEntities,
+    trim,
+    spellCheck,
+    origTxt,
+    cleanTxt,
+    autoClean
+  ])
 
   const swapPTagNewlinesSpacesOption = origTxtType === 'html' || conversionType === 'html' ? (
     <label>
@@ -201,6 +226,15 @@ function App() {
             {conversionType === 'html' && <option value="single">Wrap paragraphs separated by single newlines with p tags</option>}
             {conversionType === 'html' && <option value="multiple">Wrap paragraphs separated by multiple newlines with p tags</option>}
             <option value="remove">Remove all p tags</option>
+          </select>
+        </label>
+        <label>
+          Special Characters
+          <select onChange={e => setHTMLEntities(e.target.value)}>
+            <option value="">None</option>
+            <option value="encode">Encode all</option>
+            <option value="encode-unsafe">Encode & ignore unsafe characters</option>
+            <option value="decode">Decode</option>
           </select>
         </label>
       </section>
@@ -281,7 +315,7 @@ function App() {
       </header>
       <textarea readOnly spellCheck={false} value={cleanTxt}></textarea>
     </main>
-  );
+  )
 }
 
-export default App;
+export default App
