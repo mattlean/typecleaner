@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 function App() {
   const [origTxtType, setOrigTxtType] = useState('plain')
@@ -11,9 +11,10 @@ function App() {
   const [spellCheck, setSpellcheck] = useState(true)
   const [origTxt, setOrigTxt] = useState('')
   const [cleanTxt, setCleanTxt] = useState('')
+  const [autoClean, setAutoClean] = useState(true)
 
-  const clean = (txt) => {
-    let newTxt = txt
+  const clean = () => {
+    let newTxt = origTxt
 
     if(trim) {
       // Trim whitespaces around paragraphs
@@ -128,8 +129,12 @@ function App() {
     }
   
     console.log(JSON.stringify(newTxt))
-    return newTxt
+    setCleanTxt(newTxt)
   }
+
+  useEffect(() => {
+    if(autoClean) clean()
+  }, [origTxtType, conversionType, preventWidows, newlineTransform, spaceTransform, htmlTransform, trim, spellCheck, origTxt, cleanTxt, autoClean])
 
   let endings
   if(conversionType === 'html') {
@@ -137,7 +142,8 @@ function App() {
       <section>
         <h2>Endings</h2>
         <label>
-          <input type="checkbox" checked={preventWidows} onChange={e => setPreventWidows(e.target.checked)}  /> Prevent Widows
+          <input type="checkbox" checked={preventWidows} onChange={e => setPreventWidows(e.target.checked)} />
+          Prevent Widows
         </label>
       </section>
     )
@@ -210,17 +216,25 @@ function App() {
           </label>
         </section>
         <section>
-          <h2>Modify Text Areas</h2>
-          <button onClick={() => {
-            setOrigTxt(cleanTxt)
-            setCleanTxt('')
-          }}>Set Original Text to Cleaned Text</button>
-          <button onClick={() => setCleanTxt(clean(origTxt))}>Clean</button>
+          <h2>Clean</h2>
+          <label>
+            <input type="checkbox" checked={autoClean} onChange={(e) => setAutoClean(e.target.checked)} /> Auto-Clean
+          </label>
+          {!autoClean && <button onClick={() => clean()}>Clean</button>}
         </section>
       </section>
-      <h2 className="io">Original Text</h2>
+      <header className="txt-header">
+        <h2>Original Text</h2>
+        <button onClick={() => setOrigTxt('')}>Reset</button>
+      </header>
       <textarea spellCheck={spellCheck} value={origTxt} onChange={(e) => setOrigTxt(e.target.value)}></textarea>
-      <h2 className="io">Cleaned Text</h2>
+      <header className="txt-header">
+        <h2>Cleaned Text</h2>
+        <button onClick={() => {
+          setOrigTxt(cleanTxt)
+          setCleanTxt('')
+        }}>Set Original Text to Cleaned Text</button>
+      </header>
       <textarea readOnly spellCheck={false} value={cleanTxt}></textarea>
     </main>
   );
