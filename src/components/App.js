@@ -13,6 +13,7 @@ function App() {
   const [trim, setTrim] = useState(false)
   const [prefix, setPrefix] = useState('')
   const [suffix, setSuffix] = useState('')
+  const [abc, setABC] = useState(false)
   const [spellCheck, setSpellcheck] = useState(true)
   const [origTxt, setOrigTxt] = useState('')
   const [cleanTxt, setCleanTxt] = useState('')
@@ -160,6 +161,7 @@ function App() {
       }
     }
 
+    // Wrap newlines with characters
     if(prefix || suffix) {
       const newlines = newTxt.split('\n')
       for(const i in newlines) {
@@ -186,6 +188,11 @@ function App() {
       newTxt = encode(newTxt, { allowUnsafeSymbols: true })
     } else if(htmlEntities === 'decode') {
       newTxt = decode(newTxt)
+    }
+
+    // Order
+    if(abc) {
+      newTxt = newTxt.split('\n').sort().join('\n')
     }
   
     console.log(JSON.stringify(newTxt))
@@ -219,6 +226,7 @@ function App() {
     trim,
     prefix,
     suffix,
+    abc,
     spellCheck,
     origTxt,
     cleanTxt,
@@ -327,6 +335,13 @@ function App() {
           </label>
         </section>
         {html}
+        <section>
+          <h2>Order</h2>
+          <label>
+            <input type="checkbox" checked={abc} onChange={(e) => setABC(e.target.checked)} />
+            Alphabetize by line content
+          </label>
+        </section>
         <section>
           <h2>Miscellaneous</h2>
           <label>
