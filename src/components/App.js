@@ -11,6 +11,8 @@ function App() {
   const [pTagTransform, setPTagTransform] = useState('')
   const [htmlEntities, setHTMLEntities] = useState('')
   const [trim, setTrim] = useState(false)
+  const [prefix, setPrefix] = useState('')
+  const [suffix, setSuffix] = useState('')
   const [spellCheck, setSpellcheck] = useState(true)
   const [origTxt, setOrigTxt] = useState('')
   const [cleanTxt, setCleanTxt] = useState('')
@@ -158,6 +160,16 @@ function App() {
       }
     }
 
+    if(prefix || suffix) {
+      const newlines = newTxt.split('\n')
+      for(const i in newlines) {
+        const n  = newlines[i]
+        if(prefix) newlines[i] = `${prefix}${n}`
+        if(suffix) newlines[i] += suffix
+      }
+      newTxt = newlines.join('\n')
+    }
+
     // Spaces
     if(spaceTransform === 'reduce') {
       // Reduce multiple spaces
@@ -205,6 +217,8 @@ function App() {
     pTagTransform,
     htmlEntities,
     trim,
+    prefix,
+    suffix,
     spellCheck,
     origTxt,
     cleanTxt,
@@ -300,6 +314,17 @@ function App() {
             Trim whitespaces around paragraphs
           </label>
           {swapPTagNewlinesSpacesOption}
+        </section>
+        <section>
+          <h2>Newlines</h2>
+          <label>
+            Prefix each newline with:
+            <input type="text" value={prefix} onChange={(e) => setPrefix(e.target.value)} />
+          </label>
+          <label>
+            Suffix each newline with:
+            <input type="text" value={suffix} onChange={(e) => setSuffix(e.target.value)} />
+          </label>
         </section>
         {html}
         <section>
